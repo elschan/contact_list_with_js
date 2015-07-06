@@ -1,0 +1,19 @@
+header {
+height: 10em;
+text-align: center;
+}
+
+h1 {
+  padding-top: 1em;
+}
+
+
+#list_of {
+  text-align: center;
+  padding-top: 1em;
+}
+
+
+#hiddenForm {
+  height: 20em;
+}
