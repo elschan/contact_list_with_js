@@ -1,7 +1,7 @@
-Sinatra
-=============
+Single Page Site for storing contact info.
 
-Brought to you by Lighthouse Labs
+Sinatra App made with Javascript, Jquery, Ruby, HTML, CSS 
+
 
 ## Getting Started
 
@@ -10,7 +10,3 @@ Brought to you by Lighthouse Labs
 3. Visit `http://localhost:3000/` in your browser
 
 
-things to do:
-add contenteditable for edit
-fix find so that found can be somewhere
-add more than email? 
