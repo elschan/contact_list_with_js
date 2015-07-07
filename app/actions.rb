@@ -4,7 +4,6 @@ get '/' do
 end
 
 post '/add_user' do
-  # binding.pry
   contact = User.create(name: params[:name], email: params[:email])
 end
 

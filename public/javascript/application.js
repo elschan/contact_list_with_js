@@ -1,37 +1,34 @@
 $(document).ready(function() {
-  $('#preAdd').on('click', function(){
+  var hideAll = function() {
+    $('#add_user').css('display', 'none');
     $('#list_of').empty();
-    $('#edit_user').css('display', 'none');
     $('#list_of').css('display', 'none');
+    $('#edit_user').css('display', 'none');
+    $('#found').empty();
     $('#find_user').css('display', 'none');
-    $('#add_user').show();
+  }
 
+  $('#preAdd').on('click', function(){
+    hideAll();
+    $('#add_user').show();
   });
 
   $('#preFind').on('click', function(){
-    $('#add_user').css('display', 'none');
-    $('#edit_user').css('display', 'none');
-    $('#list_of').empty();
-    $('#list_of').css('display', 'none');
+    hideAll();
     $('#find_user').show();
   });
 
-
   $('#list').on('click', function(){
-    $('#edit_user').css('display', 'none');
-    $('#add_user').css('display', 'none');
-    $('#find_user').css('display', 'none');
-    $('#found').css('display', 'none');
+    hideAll();
     var listOf = $('#list_of');
     if (listOf.css('display') == 'none'){
+      $('#loading').show(); 
       listOf.show();
-      $('#loading').show();
     $.ajax({
       url: 'list_users',
       dataType: 'json',
       method: 'get',
       success: function(users) {
-        $('#loading').css('display', 'none');
         $.each(users, function(index,user) {
           var p = $("<p>")
           .text(user.name + " - " + user.email + "  ")
@@ -39,44 +36,42 @@ $(document).ready(function() {
           .append(" " + "<button id='"+user.id +"' class='editButton'>Edit</button>")
           .appendTo("#list_of");
         });        
-          $('.deleteButton').on('click', function(){
-            var delete_user_id = this.id
-            $(this).parent().remove();
+        $('.deleteButton').on('click', function(){
+          var delete_user_id = this.id
+          $(this).parent().remove();
+          $.ajax({
+            url: 'delete_user',
+            data: {delete_id: delete_user_id},
+            dataType: 'json',
+            method: 'DELETE',
+            success: function(e){
+              console.log(e);
+            }
+          })
+        });
+        $('.editButton').on('click', function(){
+            $("#edit_user").show();
+            var edited_user_id = this.id;
+          $("#submitEditUser").on('click', function(e){
+            e.preventDefault();
+            e.stopPropagation();
+            var editedName = $('#editName').val();
+            var editedEmail = $('#editEmail').val();
             $.ajax({
-              url: 'delete_user',
-              data: {delete_id: delete_user_id},
+              url: '/edit_user',
               dataType: 'json',
-              method: 'DELETE',
+              method: 'POST',
+              data: {newName: editedName, newEmail: editedEmail, editedUser: edited_user_id},
               success: function(e){
                 console.log(e);
+                $("#edit_user").fadeOut(1000);
               }
             })
           });
-          $('.editButton').on('click', function(){
-            $("#edit_user").show();
-            var edited_user_id = this.id;
-            $("#submitEditUser").on('click', function(e){
-            alert('hello');
-            e.preventDefault();
-            e.stopPropagation();
-
-              var editedName = $('#editName').val();
-              var editedEmail = $('#editEmail').val();
-              
-              $.ajax({
-                url: '/edit_user',
-                dataType: 'json',
-                method: 'POST',
-                data: {newName: editedName, newEmail: editedEmail, editedUser: edited_user_id},
-                success: function(e){
-                  console.log(e);
-                  $("#edit_user").fadeOut(1000);
-                }
-              })
-            });
-          });
-        }
-     })
+        });
+        $('#loading').css('display', 'none');
+      }
+   });
 
     } else {
     listOf.empty();
@@ -88,35 +83,36 @@ $(document).ready(function() {
   $('#submitFindUser').on('click', function(){
     var find_user_name = $('#findName').val();
     var find_user_email = $('#findEmail').val();
-
+    console.log(find_user_name);
     $.ajax({
       url: 'find_user',
       data: {query_name: find_user_name, query_email: find_user_email},
       dataType: 'json',
       method: 'get',
       success: function(u) {
+        console.log('check');
         $.each(u, function(index,user) {
-          var p = $("<p>").text(user.name + " - " + user.email + "  ")
-          .append("<button id='"+user.id +"' class='deleteButton'>Delete</button>").appendTo("#found");
-        })
-        $('.deleteButton').on('click', function(){
-          var delete_user_id = this.id
-          $(this).parent().remove();
-
-          $.ajax({
-            url: 'delete_user',
-            data: {delete_id: delete_user_id},
-            dataType: 'json',
-            method: 'DELETE',
-            success: function(e){
-              console.log(e);
-            }
-
-          });
+          var p = $("<p>").text(user.name + " - " + user.email + "  ").appendTo('#found');
+          console.log(user);
+          // debugger;
+          // .append("<button id='"+user.id +"' class='deleteButton'>Delete</button>").appendTo("#found");
         });
+        // $('.deleteButton').on('click', function(){
+        //   var delete_user_id = this.id
+        //   $(this).parent().remove();
+        //   $.ajax({
+        //     url: 'delete_user',
+        //     data: {delete_id: delete_user_id},
+        //     dataType: 'json',
+        //     method: 'DELETE',
+        //     success: function(e){
+        //       console.log(e);
+        //     }
+        //   });
+        // });
       }
     })
-    });
+  });
 
   // $("#add").on('click', function(){
   //   .show("add_contact");
@@ -124,7 +120,6 @@ $(document).ready(function() {
   // });
 
   var submitButton = document.querySelector('#submitNewUser');
-
   submitButton.addEventListener('click', function(e) {
     e.preventDefault();
     e.stopPropagation();
@@ -146,25 +141,4 @@ $(document).ready(function() {
       }
     );  
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // See: http://docs.jquery.com/Tutorials:Introducing_$(document).ready()
 });
